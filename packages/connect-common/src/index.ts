@@ -1,2 +1,2 @@
 export * from './messages'
-export { parseFrameMessage } from './parse'
+export { parseFrameMessage, parseParentMessage } from './parse'

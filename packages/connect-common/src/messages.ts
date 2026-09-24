@@ -22,13 +22,37 @@ export const PARENT_EVENT = {
   logout: 'mogul:logout',
 } as const
 
+/** `mogul:error` codes, so neither side hard-codes the raw strings. */
+export const CONNECT_ERROR_CODE = {
+  /** Loader: the partner's `getToken()` threw. */
+  tokenError: 'token_error',
+  /** Frame: the preselected `/embed/connect/<target>` isn't a known source. */
+  invalidTarget: 'invalid_target',
+  /**
+   * Frame: `mogul:init.clientId` doesn't match the session token's `client_id`
+   * claim, so the token is refused.
+   */
+  clientMismatch: 'client_mismatch',
+  /**
+   * Frame: the connection succeeded, but the integration ID or a complete
+   * identity couldn't be resolved, so no `mogul:success` is sent.
+   */
+  identityUnavailable: 'identity_unavailable',
+} as const
+
+export type ConnectErrorCode =
+  (typeof CONNECT_ERROR_CODE)[keyof typeof CONNECT_ERROR_CODE]
+
 /** Identity the connected source resolved to, parsed from the integration. */
 export type ConnectedIdentity = {
   /** Source-side account/entity id. */
   id: string
   /** Display name (artist / label / handle) as the source reports it. */
   name: string
-  /** One entry per connected account (a single-account target has one). */
+  /**
+   * One entry per synced account: for a multi-account login, the accounts the
+   * user chose in the picker; a single-account source has exactly one.
+   */
   accounts: Array<{ id: string; name: string }>
 }
 
@@ -38,6 +62,11 @@ export type FrameMessage =
   | { type: 'mogul:request-token' }
   | { type: 'mogul:resize'; height: number }
   | {
+      /**
+       * Sent when the user dismisses the success screen (Done), and only when
+       * every field below — including a name for every account — is present.
+       * Otherwise the frame sends `mogul:error` `identity_unavailable` instead.
+       */
       type: 'mogul:success'
       /** The created integration — the handle for later royalty-report API calls. */
       integrationId: number
@@ -46,18 +75,35 @@ export type FrameMessage =
       /** Identity parsed from the connected integration. */
       connectedIdentity: ConnectedIdentity
     }
+  /**
+   * Flow closed. Always follows the `mogul:success` or `mogul:error` for the
+   * same completion, so the parent can safely tear the frame down here.
+   */
   | { type: 'mogul:exit' }
-  | { type: 'mogul:error'; code: string }
+  | {
+      type: 'mogul:error'
+      /**
+       * A {@link ConnectErrorCode}, typed as `string` so older loaders keep
+       * working when the frame adds a code.
+       */
+      code: string
+    }
 
 /** Messages the parent sends to the frame — the loader posts these. */
 export type ParentMessage =
   | {
       type: 'mogul:init'
       token: string
-      /** Mogul-issued partner client ID (`mcci_…`). Identifies the partner; not a secret. */
+      /**
+       * Mogul-issued partner client ID (`mcci_…`). Identifies the partner; not a
+       * secret. Must equal the token's `client_id` claim: on a mismatch (or a
+       * token with no claim) the frame refuses the token and answers with
+       * `mogul:error` `client_mismatch`.
+       */
       clientId: string
       locale?: string
     }
+  /** Reserved: the frame accepts and ignores it. */
   | { type: 'mogul:logout' }
 
 export type FrameMessageType = FrameMessage['type']

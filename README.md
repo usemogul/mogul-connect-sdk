@@ -5,7 +5,7 @@ SDK packages for the embeddable Mogul Connect component.
 | package                                               | description                                                                                                                                                                                                            |
 | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`@usemogul/connect-js`](packages/connect-js)         | Loader library used by Mogul Connect partners to embed the component in their external application. Responsible for mounting the embed iframe and running the `postMessage` handshake. Ships ESM + UMD/global + types. |
-| [`@usemogul/connect-common`](packages/connect-common) | Shared schemas (message types, event-name constants, validators). Also consumed by the main Mogul application.                                                                                                         |
+| [`@usemogul/connect-common`](packages/connect-common) | Shared schemas (message types, event-name constants, error codes, validators). Also consumed by the main Mogul application. Ships ESM + CJS + types.                                                                   |
 
 `connect-js` depends on `connect-common` and bundles it, so partners install a
 single package; `connect-common` is published independently for the Mogul application

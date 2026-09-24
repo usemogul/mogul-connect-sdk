@@ -1,4 +1,4 @@
-import type { ConnectedIdentity, FrameMessage } from './messages'
+import type { ConnectedIdentity, FrameMessage, ParentMessage } from './messages'
 
 /**
  * Parse the optional `connectedIdentity` payload. All fields are required, so a
@@ -65,6 +65,34 @@ export const parseFrameMessage = (data: unknown): FrameMessage | null => {
       return typeof message.code === 'string'
         ? { type: 'mogul:error', code: message.code }
         : null
+    default:
+      return null
+  }
+}
+
+/**
+ * Narrow untrusted `postMessage` data to a known {@link ParentMessage} — the
+ * frame's counterpart to {@link parseFrameMessage}. The returned object is
+ * rebuilt from the checked fields, so extra keys never reach the frame. Anything
+ * that doesn't match returns `null`; the origin check happens separately, before
+ * this runs.
+ */
+export const parseParentMessage = (data: unknown): ParentMessage | null => {
+  if (typeof data !== 'object' || data === null) return null
+  const message = data as Record<string, unknown>
+
+  switch (message.type) {
+    case 'mogul:init': {
+      const { token, clientId, locale } = message
+      if (typeof token !== 'string' || token.length === 0) return null
+      if (typeof clientId !== 'string' || clientId.length === 0) return null
+      // A malformed `locale` is dropped rather than rejecting the whole init.
+      return typeof locale === 'string'
+        ? { type: 'mogul:init', token, clientId, locale }
+        : { type: 'mogul:init', token, clientId }
+    }
+    case 'mogul:logout':
+      return { type: 'mogul:logout' }
     default:
       return null
   }

@@ -1,3 +1,4 @@
+import { copyFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
@@ -43,7 +44,14 @@ export default defineConfig(({ command }) =>
             // package (it sees the bundled connect-common sources) and nests the
             // output under dist/connect-js/src.
             entryRoot: 'src',
-            insertTypesEntry: true,
+            // One self-contained `index.d.ts` (no relative imports), so the same
+            // file serves `require` consumers as `.d.cts`.
+            rollupTypes: true,
+            afterBuild: () =>
+              copyFileSync(
+                resolve(root, 'dist/index.d.ts'),
+                resolve(root, 'dist/index.d.cts'),
+              ),
           }),
         ],
         resolve: { alias },

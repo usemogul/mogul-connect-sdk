@@ -1,4 +1,8 @@
-import { parseFrameMessage, type ParentMessage } from '@usemogul/connect-common'
+import {
+  CONNECT_ERROR_CODE,
+  parseFrameMessage,
+  type ParentMessage,
+} from '@usemogul/connect-common'
 
 /** Identity the connected source resolved to, parsed from the integration. */
 export type MogulConnectedIdentity = {
@@ -106,7 +110,7 @@ export const create = (options: MogulConnectOptions): MogulConnectHandle => {
         post({ type: 'mogul:init', token, clientId, locale })
       }
     } catch {
-      options.onError?.({ code: 'token_error' })
+      options.onError?.({ code: CONNECT_ERROR_CODE.tokenError })
     } finally {
       tokenRequestInFlight = false
     }
