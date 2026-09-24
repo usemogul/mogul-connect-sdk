@@ -5,6 +5,7 @@ const byId = <T extends HTMLElement>(id: string): T =>
 
 const form = byId<HTMLFormElement>('config')
 const originInput = byId<HTMLInputElement>('origin')
+const clientIdInput = byId<HTMLInputElement>('client-id')
 const targetInput = byId<HTMLInputElement>('target')
 const tokenInput = byId<HTMLTextAreaElement>('token')
 const container = byId<HTMLDivElement>('container')
@@ -27,12 +28,14 @@ form.addEventListener('submit', event => {
   logEl.textContent = ''
 
   const origin = originInput.value.trim()
+  const clientId = clientIdInput.value.trim()
   const target = targetInput.value.trim() || undefined
   const token = tokenInput.value.trim()
-  log('mounting', origin, target ?? '(no target)')
+  log('mounting', origin, clientId, target ?? '(no target)')
 
   handle = MogulConnect.create({
     origin,
+    clientId,
     target,
     container,
     getToken: async () => {

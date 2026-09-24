@@ -24,6 +24,7 @@ const handle = MogulConnect.create({
   origin: 'https://embed.usemogul.com', // the Mogul embed host
   container: document.getElementById('mogul-connect')!,
   getToken: async () => fetchSessionTokenFromYourBackend(), // always-fresh
+  clientId: 'mcci_…', // your partner client ID (public — never the secret)
   target: 'DISTROKID', // optional: preselect a source; omit to display a search
   onSuccess: ({ integrationId, accountId, connectedIdentity }) =>
     console.log('connected', integrationId, accountId, connectedIdentity),
@@ -45,6 +46,7 @@ Also available as a UMD/global build (`window.MogulConnect.create(...)`) via a
 | `origin`    | `string`                                | Embed host origin. Required.                                    |
 | `container` | `HTMLElement`                           | Where the iframe mounts. Required.                              |
 | `getToken`  | `() => Promise<string>`                 | Returns a session token. Called on ready **and** every refresh. |
+| `clientId`  | `string`                                | Your partner client ID (`mcci_…`). Required. Not a secret.      |
 | `target`    | `string`                                | Preselected `IntegrationTarget` (path segment, not a secret).   |
 | `locale`    | `string`                                | Forwarded in `mogul:init`.                                      |
 | `onReady`   | `() => void`                            | Frame mounted.                                                  |
@@ -71,6 +73,9 @@ Also available as a UMD/global build (`window.MogulConnect.create(...)`) via a
 
 - The token travels **only** via `postMessage` — never in the iframe URL, a
   cookie, or `localStorage`. `getToken` is called on demand.
+- `clientId` is public and is sent with every token in `mogul:init`, so Mogul
+  can verify which partner is embedding the component. Never put your client
+  secret in browser code.
 - Outbound messages always target the exact embed origin, never `'*'`.
 - Inbound messages are accepted only from the loader's own iframe and the exact
   embed origin, then shape-validated, before anything is acted on.

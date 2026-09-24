@@ -9,7 +9,8 @@ Zero runtime dependencies. Ships ESM + TypeScript types.
 
 ## Exports
 
-- `FrameMessage` / `ParentMessage` — the message unions
+- `FrameMessage` / `ParentMessage` — the message unions (`mogul:init` carries
+  the session `token` and the partner's public `clientId`)
 - `ConnectedIdentity` — identity payload carried on `mogul:success`
 - `FRAME_EVENT` / `PARENT_EVENT` — event-name constants
 - `parseFrameMessage(data)` — validates untrusted `postMessage` data into a known

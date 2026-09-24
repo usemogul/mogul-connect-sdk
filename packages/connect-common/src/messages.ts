@@ -51,7 +51,13 @@ export type FrameMessage =
 
 /** Messages the parent sends to the frame — the loader posts these. */
 export type ParentMessage =
-  | { type: 'mogul:init'; token: string; locale?: string }
+  | {
+      type: 'mogul:init'
+      token: string
+      /** Mogul-issued partner client ID (`mcci_…`). Identifies the partner; not a secret. */
+      clientId: string
+      locale?: string
+    }
   | { type: 'mogul:logout' }
 
 export type FrameMessageType = FrameMessage['type']

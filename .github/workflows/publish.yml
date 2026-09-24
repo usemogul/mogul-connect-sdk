@@ -1,0 +1,77 @@
+# Publishes one package to npm per GitHub Release.
+#
+# Tag each release `<package-dir>@<version>` — e.g. `connect-js@0.2.0` or
+# `connect-common@0.2.0` (a leading `v` on the version is allowed). The version
+# must already match that package's package.json. Pre-releases publish under the
+# `next` dist-tag; everything else under `latest`.
+#
+# Auth is npm trusted publishing (OIDC) — no NPM_TOKEN. Each package needs a
+# trusted publisher on npmjs.com matching this repo, this workflow's filename
+# (`publish.yml`), and the `npm` environment.
+name: Publish
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write # OIDC token for npm trusted publishing
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24' # bundles npm >= 11.5.1, required for trusted publishing
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false # no dependency cache in a job that holds publish credentials
+
+      - name: Resolve package from release tag
+        id: pkg
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+          PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          if [[ ! "$TAG" =~ ^(connect-js|connect-common)@v?(.+)$ ]]; then
+            echo "::error::Release tag '$TAG' must be <package>@<version>, e.g. connect-js@0.2.0"
+            exit 1
+          fi
+          dir="packages/${BASH_REMATCH[1]}"
+          tag_version="${BASH_REMATCH[2]}"
+          name=$(node -p "require('./$dir/package.json').name")
+          version=$(node -p "require('./$dir/package.json').version")
+          if [[ "$version" != "$tag_version" ]]; then
+            echo "::error::Tag version $tag_version does not match $dir/package.json version $version"
+            exit 1
+          fi
+          if npm view "$name@$version" version >/dev/null 2>&1; then
+            echo "::error::$name@$version is already published"
+            exit 1
+          fi
+          dist_tag=latest
+          if [[ "$PRERELEASE" == 'true' ]]; then dist_tag=next; fi
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "dist_tag=$dist_tag" >> "$GITHUB_OUTPUT"
+          echo "Publishing $name@$version (dist-tag: $dist_tag)"
+
+      - run: npm ci
+
+      # Repo-wide checks; the package's own `prepublishOnly` (typecheck + test)
+      # and `prepack` (build) run as part of `npm publish` below.
+      - run: npm run lint
+      - run: npm run format:check
+
+      - name: Publish
+        run: npm publish --workspace "$NAME" --tag "$DIST_TAG"
+        env:
+          NAME: ${{ steps.pkg.outputs.name }}
+          DIST_TAG: ${{ steps.pkg.outputs.dist_tag }}

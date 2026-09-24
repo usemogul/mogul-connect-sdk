@@ -28,6 +28,12 @@ export type MogulConnectOptions = {
    * on demand) rather than returning one static token.
    */
   getToken: () => Promise<string>
+  /**
+   * Your Mogul-issued partner client ID (`mcci_…`). Public, so safe to ship in
+   * browser code — never pass the client secret here. Sent alongside the token
+   * in every `mogul:init` so Mogul can verify which partner is embedding it.
+   */
+  clientId: string
   /** Preselected `IntegrationTarget` → `/embed/connect/<target>`. Not a secret. */
   target?: string
   locale?: string
@@ -62,12 +68,13 @@ const buildSrc = (embedOrigin: string, target?: string): string => {
  * iframe URL.
  */
 export const create = (options: MogulConnectOptions): MogulConnectHandle => {
-  const { container, getToken, target, locale } = options
+  const { container, getToken, clientId, target, locale } = options
   if (!options.origin) throw new Error('MogulConnect: `origin` is required')
   if (!container) throw new Error('MogulConnect: `container` is required')
   if (typeof getToken !== 'function') {
     throw new Error('MogulConnect: `getToken` is required')
   }
+  if (!clientId) throw new Error('MogulConnect: `clientId` is required')
 
   // Normalize to a bare origin so the targetOrigin checks below are exact.
   const embedOrigin = new URL(options.origin).origin
@@ -96,7 +103,7 @@ export const create = (options: MogulConnectOptions): MogulConnectHandle => {
       const token = await getToken()
       if (destroyed) return
       if (typeof token === 'string' && token.length > 0) {
-        post({ type: 'mogul:init', token, locale })
+        post({ type: 'mogul:init', token, clientId, locale })
       }
     } catch {
       options.onError?.({ code: 'token_error' })

@@ -3,6 +3,7 @@ import { MogulConnect } from './index'
 import type { MogulConnectOptions } from './create'
 
 const ORIGIN = 'https://embed.usemogul.com'
+const CLIENT_ID = 'mcci_test'
 
 const tick = () => new Promise(resolve => setTimeout(resolve, 0))
 
@@ -21,6 +22,7 @@ const setup = (overrides: Partial<MogulConnectOptions> = {}) => {
     origin: ORIGIN,
     container,
     getToken,
+    clientId: CLIENT_ID,
     ...overrides,
   })
 
@@ -75,6 +77,7 @@ describe('MogulConnect.create', () => {
       expect.objectContaining({
         type: 'mogul:init',
         token: 'jwt.header.payload',
+        clientId: CLIENT_ID,
       }),
       ORIGIN,
     )
@@ -83,6 +86,20 @@ describe('MogulConnect.create', () => {
       expect(targetOrigin).not.toBe('*')
     }
     void handle
+  })
+
+  it('requires a clientId', () => {
+    const container = document.createElement('div')
+    const base = { origin: ORIGIN, container, getToken: async () => 't' }
+    for (const clientId of [undefined, '']) {
+      expect(() =>
+        MogulConnect.create({
+          ...base,
+          clientId,
+        } as unknown as MogulConnectOptions),
+      ).toThrow('`clientId` is required')
+    }
+    expect(container.querySelector('iframe')).toBeNull()
   })
 
   it('never puts the token in the iframe URL', () => {
@@ -121,7 +138,11 @@ describe('MogulConnect.create', () => {
 
     expect(getToken).toHaveBeenCalledTimes(2)
     expect(post).toHaveBeenLastCalledWith(
-      expect.objectContaining({ type: 'mogul:init', token: 'token.two' }),
+      expect.objectContaining({
+        type: 'mogul:init',
+        token: 'token.two',
+        clientId: CLIENT_ID,
+      }),
       ORIGIN,
     )
   })
