@@ -1,0 +1,49 @@
+{
+  "name": "@usemogul/connect-js",
+  "version": "0.1.0",
+  "description": "Loader that embeds the Mogul Connect component in a partner's application via an iframe and runs the postMessage handshake.",
+  "license": "Apache-2.0",
+  "author": "shawn@usemogul.com",
+  "homepage": "https://usemogul.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/usemogul/mogul-connect-sdk.git",
+    "directory": "packages/connect-js"
+  },
+  "bugs": {
+    "url": "https://github.com/usemogul/mogul-connect-sdk/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.umd.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/index.umd.cjs",
+  "jsdelivr": "./dist/index.umd.cjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run typecheck && npm run test"
+  },
+  "devDependencies": {
+    "@usemogul/connect-common": "*"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

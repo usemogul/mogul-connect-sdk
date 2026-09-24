@@ -1,0 +1,40 @@
+{
+  "name": "@usemogul/connect-common",
+  "version": "0.1.0",
+  "description": "Shared schemas for the Mogul Connect embedded component: message types, event-name constants, and validators shared by the connect-js loader and the Mogul application.",
+  "license": "Apache-2.0",
+  "author": "shawn@usemogul.com",
+  "homepage": "https://usemogul.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/usemogul/mogul-connect-sdk.git",
+    "directory": "packages/connect-common"
+  },
+  "bugs": {
+    "url": "https://github.com/usemogul/mogul-connect-sdk/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run typecheck && npm run test"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

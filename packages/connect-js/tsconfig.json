@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@usemogul/connect-js": ["./src/index.ts"],
+      "@usemogul/connect-common": ["../connect-common/src/index.ts"]
+    }
+  },
+  "include": ["src", "demo", "vite.config.ts", "vitest.config.ts"]
+}

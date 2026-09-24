@@ -1,0 +1,42 @@
+{
+  "name": "mogul-connect-sdk",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Monorepo for the embeddable Mogul Connect component: the loader (@usemogul/connect-js) and its shared wire schemas (@usemogul/connect-common).",
+  "license": "Apache-2.0",
+  "author": "shawn@usemogul.com",
+  "homepage": "https://usemogul.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/usemogul/mogul-connect-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/usemogul/mogul-connect-sdk/issues"
+  },
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "eslint .",
+    "format": "prettier --write \"packages/*/{src,demo}/**/*.{ts,html}\"",
+    "format:check": "prettier --check \"packages/*/{src,demo}/**/*.{ts,html}\"",
+    "dev": "npm run dev --workspace @usemogul/connect-js"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/node": "^22.10.2",
+    "eslint": "^9.17.0",
+    "globals": "^15.14.0",
+    "jsdom": "^25.0.1",
+    "prettier": "^3.4.2",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.18.1",
+    "vite": "^5.4.11",
+    "vite-plugin-dts": "^4.4.0",
+    "vitest": "^2.1.8"
+  }
+}
