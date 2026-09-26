@@ -26,8 +26,8 @@ const handle = MogulConnect.create({
   getToken: async () => fetchSessionTokenFromYourBackend(), // always-fresh
   clientId: 'mcci_…', // your partner client ID (public — never the secret)
   target: 'DISTROKID', // optional: preselect a source; omit to display a search
-  onSuccess: ({ integrationId, accountId, connectedIdentity }) =>
-    console.log('connected', integrationId, accountId, connectedIdentity),
+  onSuccess: ({ sourceId, accountId, connectedIdentity }) =>
+    console.log('connected', sourceId, accountId, connectedIdentity),
   onExit: () => handle.destroy(),
   onError: err => console.error(err),
 })
@@ -58,8 +58,8 @@ Also available as a UMD/global build (`window.MogulConnect.create(...)`) via a
 
 `onSuccess` receives a `MogulConnectSuccess` (all fields present):
 
-- `integrationId: number` — the created integration; use it for later Mogul API
-  calls (e.g. royalty reports for the connected source).
+- `sourceId: number` — the connected source; use it for later Mogul API calls
+  (e.g. its royalty reports).
 - `accountId: string` — the Mogul account the integration belongs to.
 - `connectedIdentity: { id: string; name: string; accounts: { id: string; name: string }[] }`
   — identity parsed from the integration; `accounts` has one entry per synced
@@ -74,14 +74,14 @@ Also available as a UMD/global build (`window.MogulConnect.create(...)`) via a
 `@usemogul/connect-common` as `CONNECT_ERROR_CODE`. New codes may be added, so
 treat unknown ones as a generic failure.
 
-| code                   | emitted by | meaning                                                                                                             |
-| ---------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------- |
-| `token_error`          | loader     | Your `getToken()` threw.                                                                                            |
-| `invalid_target`       | frame      | `target` isn't a known source.                                                                                      |
-| `client_mismatch`      | frame      | `clientId` doesn't match the session token's `client_id` claim, so the token is refused and the flow never loads.   |
-| `identity_unavailable` | frame      | The source connected, but the integration or a complete identity couldn't be resolved, so `onSuccess` doesn't fire. |
-| `origin_not_allowed`   | frame      | Your page's origin isn't registered for your `clientId`, so the token is refused and the flow never loads.          |
-| `verification_failed`  | frame      | The frame couldn't reach Mogul to verify your origin. Transient: remount to retry.                                  |
+| code                   | emitted by | meaning                                                                                                           |
+| ---------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------- |
+| `token_error`          | loader     | Your `getToken()` threw.                                                                                          |
+| `invalid_target`       | frame      | `target` isn't a known source.                                                                                    |
+| `client_mismatch`      | frame      | `clientId` doesn't match the session token's `client_id` claim, so the token is refused and the flow never loads. |
+| `identity_unavailable` | frame      | The source connected, but the source ID or a complete identity couldn't be resolved, so `onSuccess` doesn't fire. |
+| `origin_not_allowed`   | frame      | Your page's origin isn't registered for your `clientId`, so the token is refused and the flow never loads.        |
+| `verification_failed`  | frame      | The frame couldn't reach Mogul to verify your origin. Transient: remount to retry.                                |
 
 ### Frame behavior
 
@@ -94,7 +94,7 @@ sequenceDiagram
     Note over F: clientId must equal the token's client_id claim
     F->>L: mogul:request-token (token near expiry)
     L->>F: mogul:init {token, clientId}
-    F->>L: mogul:success {integrationId, accountId, connectedIdentity}
+    F->>L: mogul:success {sourceId, accountId, connectedIdentity}
     F->>L: mogul:exit
 ```
 
@@ -106,7 +106,7 @@ sequenceDiagram
   your own iframe, register every ancestor page's origin too. Otherwise the
   browser blocks the frame, or the frame refuses the token with
   `origin_not_allowed`.
-- **Success is all-or-nothing.** `onSuccess` fires only when `integrationId`,
+- **Success is all-or-nothing.** `onSuccess` fires only when `sourceId`,
   `accountId`, `connectedIdentity.id`, `connectedIdentity.name` and a name for
   every account are all present. Otherwise `onError` gets `identity_unavailable`.
 - **`accounts` lists synced accounts only.** For a multi-account login, these

@@ -13,8 +13,8 @@ export type MogulConnectedIdentity = {
 
 /** Payload passed to `onSuccess` when a source connects. */
 export type MogulConnectSuccess = {
-  /** The created integration — the handle for later royalty-report API calls. */
-  integrationId: number
+  /** The connected source — the handle for later royalty-report API calls. */
+  sourceId: number
   /** Mogul account the integration belongs to. */
   accountId: string
   /** Identity parsed from the connected integration. */
@@ -143,7 +143,7 @@ export const create = (options: MogulConnectOptions): MogulConnectHandle => {
         break
       case 'mogul:success':
         options.onSuccess?.({
-          integrationId: message.integrationId,
+          sourceId: message.sourceId,
           accountId: message.accountId,
           connectedIdentity: message.connectedIdentity,
         })

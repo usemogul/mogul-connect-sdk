@@ -19,7 +19,7 @@ describe('parseFrameMessage', () => {
   it('accepts a fully-formed success message', () => {
     const success = {
       type: 'mogul:success',
-      integrationId: 7,
+      sourceId: 7,
       accountId: 'acct_1',
       connectedIdentity: {
         id: 'ext_1',
@@ -44,18 +44,24 @@ describe('parseFrameMessage', () => {
         type: 'mogul:success',
         accountId: 'acct_1',
         connectedIdentity: identity,
-      }, // no integrationId
-      { type: 'mogul:success', integrationId: 7, connectedIdentity: identity }, // no accountId
-      { type: 'mogul:success', integrationId: 7, accountId: 'acct_1' }, // no connectedIdentity
-      {
-        type: 'mogul:success',
-        integrationId: '7',
-        accountId: 'acct_1',
-        connectedIdentity: identity,
-      }, // non-numeric integrationId
+      }, // no sourceId
       {
         type: 'mogul:success',
         integrationId: 7,
+        accountId: 'acct_1',
+        connectedIdentity: identity,
+      }, // legacy integrationId instead of sourceId
+      { type: 'mogul:success', sourceId: 7, connectedIdentity: identity }, // no accountId
+      { type: 'mogul:success', sourceId: 7, accountId: 'acct_1' }, // no connectedIdentity
+      {
+        type: 'mogul:success',
+        sourceId: '7',
+        accountId: 'acct_1',
+        connectedIdentity: identity,
+      }, // non-numeric sourceId
+      {
+        type: 'mogul:success',
+        sourceId: 7,
         accountId: 'acct_1',
         connectedIdentity: { id: 'x', name: 'y' }, // incomplete identity (no accounts)
       },
@@ -135,7 +141,7 @@ describe('parseParentMessage', () => {
     expect(
       parseParentMessage({
         type: 'mogul:success',
-        integrationId: 7,
+        sourceId: 7,
         accountId: 'acct_1',
         connectedIdentity: { id: 'x', name: 'y', accounts: [] },
       }),

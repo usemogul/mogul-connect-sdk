@@ -1,6 +1,6 @@
 {
   "name": "@usemogul/connect-common",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Shared schemas for the Mogul Connect embedded component: message types, event-name constants, and validators shared by the connect-js loader and the Mogul application.",
   "license": "Apache-2.0",
   "author": "shawn@usemogul.com",
