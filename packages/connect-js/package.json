@@ -1,6 +1,6 @@
 {
   "name": "@usemogul/connect-js",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Loader that embeds the Mogul Connect component in a partner's application via an iframe and runs the postMessage handshake.",
   "license": "Apache-2.0",
   "author": "shawn@usemogul.com",

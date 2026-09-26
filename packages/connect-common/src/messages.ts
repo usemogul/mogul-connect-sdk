@@ -33,7 +33,7 @@ export const CONNECT_ERROR_CODE = {
    */
   clientMismatch: 'client_mismatch',
   /**
-   * Frame: the connection succeeded, but the integration ID or a complete
+   * Frame: the connection succeeded, but the source ID or a complete
    * identity couldn't be resolved, so no `mogul:success` is sent.
    */
   identityUnavailable: 'identity_unavailable',
@@ -77,8 +77,8 @@ export type FrameMessage =
        * Otherwise the frame sends `mogul:error` `identity_unavailable` instead.
        */
       type: 'mogul:success'
-      /** The created integration — the handle for later royalty-report API calls. */
-      integrationId: number
+      /** The connected source. Used for royalty-report API calls. */
+      sourceId: number
       /** Mogul account the integration belongs to (from the session token). */
       accountId: string
       /** Identity parsed from the connected integration. */

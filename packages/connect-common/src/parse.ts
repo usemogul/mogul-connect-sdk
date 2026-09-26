@@ -46,12 +46,12 @@ export const parseFrameMessage = (data: unknown): FrameMessage | null => {
       const connectedIdentity = parseConnectedIdentity(
         message.connectedIdentity,
       )
-      return typeof message.integrationId === 'number' &&
+      return typeof message.sourceId === 'number' &&
         typeof message.accountId === 'string' &&
         connectedIdentity
         ? {
             type: 'mogul:success',
-            integrationId: message.integrationId,
+            sourceId: message.sourceId,
             accountId: message.accountId,
             connectedIdentity,
           }

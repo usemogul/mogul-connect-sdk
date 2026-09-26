@@ -193,7 +193,7 @@ describe('MogulConnect.create', () => {
 
     emit({
       type: 'mogul:success',
-      integrationId: 42,
+      sourceId: 42,
       accountId: 'acct_1',
       connectedIdentity: {
         id: 'ext_1',
@@ -205,7 +205,7 @@ describe('MogulConnect.create', () => {
     emit({ type: 'mogul:error', code: 'invalid_target' })
 
     expect(onSuccess).toHaveBeenCalledWith({
-      integrationId: 42,
+      sourceId: 42,
       accountId: 'acct_1',
       connectedIdentity: {
         id: 'ext_1',
@@ -223,7 +223,7 @@ describe('MogulConnect.create', () => {
     handle.destroy()
 
     expect(container.querySelector('iframe')).toBeNull()
-    emit({ type: 'mogul:success', integrationId: 1 })
+    emit({ type: 'mogul:success', sourceId: 1 })
     await tick()
     expect(onSuccess).not.toHaveBeenCalled()
   })
